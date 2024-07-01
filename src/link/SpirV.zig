@@ -27,7 +27,9 @@ const Allocator = std.mem.Allocator;
 const assert = std.debug.assert;
 const log = std.log.scoped(.link);
 
-const Module = @import("../Module.zig");
+const Zcu = @import("../Zcu.zig");
+/// Deprecated.
+const Module = Zcu;
 const InternPool = @import("../InternPool.zig");
 const Compilation = @import("../Compilation.zig");
 const link = @import("../link.zig");
@@ -232,6 +234,7 @@ pub fn flushModule(self: *SpirV, arena: Allocator, prog_node: std.Progress.Node)
         // name if it contains no strange characters is nice for debugging. URI encoding fits the bill.
         // We're using : as separator, which is a reserved character.
 
+        try error_info.append(':');
         try std.Uri.Component.percentEncode(
             error_info.writer(),
             name.toSlice(&mod.intern_pool),

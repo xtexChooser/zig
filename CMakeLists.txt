@@ -38,7 +38,7 @@ project(zig
 )
 
 set(ZIG_VERSION_MAJOR 0)
-set(ZIG_VERSION_MINOR 13)
+set(ZIG_VERSION_MINOR 14)
 set(ZIG_VERSION_PATCH 0)
 set(ZIG_VERSION "" CACHE STRING "Override Zig version string. Default is to find out with git.")
 
@@ -513,7 +513,6 @@ set(ZIG_STAGE2_SOURCES
     src/InternPool.zig
     src/Liveness.zig
     src/Liveness/Verify.zig
-    src/Module.zig
     src/Package.zig
     src/Package/Fetch.zig
     src/Package/Fetch/git.zig
@@ -524,6 +523,7 @@ set(ZIG_STAGE2_SOURCES
     src/Sema/bitcast.zig
     src/Sema/comptime_ptr_access.zig
     src/Value.zig
+    src/Zcu.zig
     src/arch/aarch64/CodeGen.zig
     src/arch/aarch64/Emit.zig
     src/arch/aarch64/Mir.zig
@@ -923,8 +923,11 @@ if(MSVC OR MINGW)
 endif()
 
 
-# "-Dno-langref" and "-Dstd-docs=false" are hardcoded because they take too long to build.
-# To obtain these two forms of documentation, run zig build against stage3 rather than stage2.
+# "-Dno-langref" is hardcoded because stage2 builds lack the `@cImport`
+# feature, which some of the doctests rely on.
+
+# To obtain this document, run `zig build` against stage3 rather than stage2.
+# Note that the `langref` step can be used to isolate this task.
 set(ZIG_BUILD_ARGS
   --zig-lib-dir "${PROJECT_SOURCE_DIR}/lib"
 
@@ -936,7 +939,6 @@ set(ZIG_BUILD_ARGS
   "-Dconfig_h=${ZIG_CONFIG_H_OUT}"
 
   -Dno-langref
-  -Dstd-docs=false
 )
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
